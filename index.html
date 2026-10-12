@@ -42,14 +42,40 @@
       position: relative;
       overflow-x: hidden;
       background-image: 
-        radial-gradient(ellipse 60% 50% at 50% -20%, rgba(184, 69, 42, 0.25), transparent),
-        radial-gradient(circle at 80% 80%, rgba(30, 58, 138, 0.15), transparent);
+        radial-gradient(circle at 80% 80%, rgba(30, 58, 138, 0.12), transparent);
+    }
+
+    /* Ambient cursor glow follower */
+    .cursor-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 650px;
+      height: 650px;
+      margin-left: -325px;
+      margin-top: -325px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle closest-side,
+        rgba(224, 104, 71, 0.28) 0%,
+        rgba(184, 69, 42, 0.18) 40%,
+        rgba(184, 69, 42, 0.06) 70%,
+        transparent 100%
+      );
+      filter: blur(48px);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+      will-change: transform, opacity;
     }
 
     .container {
       width: 100%;
       max-width: 520px;
       perspective: 1000px;
+      position: relative;
+      z-index: 2;
     }
 
     .card {
@@ -275,6 +301,8 @@
   </style>
 </head>
 <body>
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+
   <div class="container">
     <div class="card">
       <div class="avatar-wrapper">
@@ -385,7 +413,7 @@
       })
       .then(() => {
         clearTimeout(timeoutId);
-        // Successful reachability - wait 1.7s before redirecting
+        // Successful reachability - wait before redirecting
         setTimeout(() => {
           window.location.replace(TARGET_URL);
         }, REDIRECT_DELAY_MS);
@@ -395,6 +423,38 @@
         // If abort was triggered or network failed
         showConstructionPage();
       });
+
+      // Cursor follower
+      const glow = document.getElementById('cursor-glow');
+      if (glow) {
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let currentX = mouseX;
+        let currentY = mouseY;
+        let isVisible = false;
+
+        window.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          if (!isVisible) {
+            isVisible = true;
+            glow.style.opacity = '1';
+          }
+        });
+
+        document.addEventListener('mouseleave', () => {
+          isVisible = false;
+          glow.style.opacity = '0';
+        });
+
+        function renderFollower() {
+          currentX += (mouseX - currentX) * 0.08;
+          currentY += (mouseY - currentY) * 0.08;
+          glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+          requestAnimationFrame(renderFollower);
+        }
+        requestAnimationFrame(renderFollower);
+      }
     })();
   </script>
 </body>
