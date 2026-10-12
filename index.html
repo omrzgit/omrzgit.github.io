@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omer Muneer &mdash; Redirecting to oomer.dev</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="description" content="Portfolio of Omer Muneer. Redirecting to oomer.dev." />
+
+  <!-- Canonical link -->
+  <link rel="canonical" href="https://oomer.dev/" />
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-glow: rgba(184, 69, 42, 0.15);
+      --accent: #b8452a;
+      --accent-light: #e06847;
+      --accent-glow: rgba(184, 69, 42, 0.35);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-stack);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(ellipse 60% 50% at 50% -20%, rgba(184, 69, 42, 0.25), transparent),
+        radial-gradient(circle at 80% 80%, rgba(30, 58, 138, 0.15), transparent);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      perspective: 1000px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.75rem 2.25rem;
+      text-align: center;
+      box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.7), 0 0 35px var(--card-glow);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.75rem;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--accent), #f97316);
+      opacity: 0.6;
+      filter: blur(8px);
+      animation: pulse-glow 3s ease-in-out infinite alternate;
+    }
+
+    .avatar {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #1f2937, #111827);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      font-family: Georgia, serif;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin-bottom: 2rem;
+    }
+
+    /* State Views */
+    .view {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Loading view styles */
+    .spinner-wrapper {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .spinner {
+      width: 100%;
+      height: 100%;
+      border: 3px solid rgba(255, 255, 255, 0.08);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s cubic-bezier(0.55, 0.25, 0.25, 0.7) infinite;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 1.5rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 4px;
+      animation: progress 2.5s ease-out forwards;
+    }
+
+    /* Construction / fallback view styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(184, 69, 42, 0.15);
+      border: 1px solid rgba(184, 69, 42, 0.35);
+      color: #fca5a5;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ef4444;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      padding: 0.85rem 1.6rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--accent-glow);
+      transition: all 0.2s ease;
+      width: 100%;
+      max-width: 280px;
+      margin: 0.5rem auto 1rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px var(--accent-glow);
+      filter: brightness(1.08);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .social-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s ease;
+    }
+
+    .social-link:hover {
+      color: #ffffff;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes pulse-glow {
+      0% { opacity: 0.4; transform: scale(0.96); }
+      100% { opacity: 0.8; transform: scale(1.04); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="avatar-wrapper">
+        <div class="avatar-ring"></div>
+        <div class="avatar">O</div>
+      </div>
+
+      <!-- VIEW 1: Redirecting State -->
+      <div id="redirect-view" class="view active">
+        <h1>Redirecting...</h1>
+        <p class="subtitle">
+          Taking you to Omer Muneer's official portfolio at <br />
+          <strong style="color: #ffffff; font-weight: 600;">oomer.dev</strong>
+        </p>
+
+        <div class="spinner-wrapper">
+          <div class="spinner"></div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          If you are not redirected automatically in a moment,
+          <br />
+          <a href="https://oomer.dev/" id="direct-link" style="color: var(--accent-light); text-decoration: underline;">click here to continue</a>.
+        </p>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Under Construction Fallback State -->
+      <div id="construction-view" class="view">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Maintenance in Progress
+        </div>
+
+        <h1>Site Under Construction</h1>
+        <p class="subtitle">
+          We're currently updating and fine-tuning the website at <strong>oomer.dev</strong>. Please check back shortly!
+        </p>
+
+        <a href="https://oomer.dev/" class="btn" id="retry-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Try oomer.dev Again
+        </a>
+
+        <div class="social-links">
+          <a class="social-link" href="https://github.com/omrzgit" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <a class="social-link" href="https://linkedin.com/in/omermuneer" target="_blank" rel="noopener noreferrer">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            LinkedIn
+          </a>
+          <a class="social-link" href="mailto:work4omer@gmail.com">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const TARGET_URL = "https://oomer.dev/";
+      const TIMEOUT_MS = 3500;
+      let hasFailed = false;
+
+      const redirectView = document.getElementById("redirect-view");
+      const constructionView = document.getElementById("construction-view");
+
+      function showConstructionPage() {
+        if (hasFailed) return;
+        hasFailed = true;
+        redirectView.classList.remove("active");
+        constructionView.classList.add("active");
+        document.title = "Site Under Construction &mdash; Omer Muneer";
+      }
+
+      // Check URL parameters for explicit test/fallback mode (?construction=1)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("construction") === "1" || urlParams.get("fallback") === "1") {
+        showConstructionPage();
+        return;
+      }
+
+      // Health-check verification
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        showConstructionPage();
+      }, TIMEOUT_MS);
+
+      // Perform a no-cors fetch to verify network reachability of oomer.dev
+      fetch(TARGET_URL, {
+        method: "HEAD",
+        mode: "no-cors",
+        cache: "no-cache",
+        signal: controller.signal
+      })
+      .then(() => {
+        clearTimeout(timeoutId);
+        // Successful reachability - redirect
+        window.location.replace(TARGET_URL);
+      })
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        // If abort was triggered or network failed
+        showConstructionPage();
+      });
+    })();
+  </script>
+</body>
+</html>
